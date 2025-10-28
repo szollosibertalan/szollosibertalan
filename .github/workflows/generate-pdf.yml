@@ -1,0 +1,34 @@
+name: Generate PDF from Markdown
+
+on:
+  push:
+    paths:
+      - 'docs/NestJS-guide.md'
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-latex-recommended texlive-fonts-recommended
+
+      - name: Convert Markdown to PDF
+        run: |
+          pandoc docs/NestJS-guide.md -o docs/NestJS-guide.pdf --pdf-engine=xelatex
+
+      - name: Commit PDF
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: 'github-actions'
+          author_email: 'actions@users.noreply.github.com'
+          message: 'chore: add generated NestJS PDF'
+          add: 'docs/NestJS-guide.pdf'
+          push: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
